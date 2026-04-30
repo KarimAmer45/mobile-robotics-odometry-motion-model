@@ -15,3 +15,24 @@ alpha = [1.0, 1.0, 0.01, 0.01]
 print(ex3.sample_motion_model(pose, u, alpha))
 PY
 ```
+
+## Result screenshots
+
+![mobile-robotics-odometry-motion-model result screenshot](docs/results/result-screenshot.png)
+
+Sampled pose cloud from the odometry motion model.
+
+
+## What this demonstrates
+
+- Inverse odometry decomposition and noisy sample propagation.
+- Likelihood evaluation for odometry-based motion updates.
+- Visual intuition for how motion noise spreads pose hypotheses.
+
+
+## Limitations and next steps
+
+- The model is odometry-only and does not fuse observations.
+- Noise parameters are example values rather than learned calibration.
+- Next steps: add calibration from recorded odometry/ground-truth pairs.
+
