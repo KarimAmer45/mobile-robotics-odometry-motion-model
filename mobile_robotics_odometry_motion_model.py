@@ -10,7 +10,6 @@ def wrapToPi(theta):
 
 
 def inverse_motion_model(pose_t_1, pose_t):
-    ##STUDENT_CODE:  #TODO Compute rot1,trans and rot2 of the inverse motion model.
     pose_t_1 = np.asarray(pose_t_1, dtype=float)
     pose_t = np.asarray(pose_t, dtype=float)
     dx = pose_t[0] - pose_t_1[0]
@@ -19,26 +18,22 @@ def inverse_motion_model(pose_t_1, pose_t):
     rot1 = wrapToPi(np.arctan2(dy, dx) - pose_t_1[2])
     rot2 = wrapToPi(pose_t[2] - pose_t_1[2] - rot1)
 
-    ##END_STUDENT_CODE:
     return rot1, trans, rot2
 
 
 def probability_density(mean, variance):
     variance = max(variance,0.00001) #Avoid division by 0!
 
-    ##STUDENT_CODE:  #TODO Compute normal distribution
     density = (1 / np.sqrt(2 * np.pi * variance)) * np.exp(
         -0.5 * (mean**2) / variance
     )
 
-    ##END_STUDENT_CODE
     return density
 
 
 def motion_model(x_t, x_t_1, u_t, alpha, marginalise_p3=False):
 
     
-    ##STUDENT_CODE:  #TODO Compute p1, p2 and p3!
     rot1, trans, rot2 = inverse_motion_model(x_t_1, x_t)
     rot1_bar, trans_bar, rot2_bar = inverse_motion_model(u_t[0], u_t[1])
 
@@ -55,7 +50,6 @@ def motion_model(x_t, x_t_1, u_t, alpha, marginalise_p3=False):
         alpha[0] * rot2_bar**2 + alpha[1] * trans_bar**2,
     )
 
-    ##END_STUDENT_CODE 
     if marginalise_p3: 
         return p1 * p2
     else:
@@ -74,7 +68,6 @@ def plot_posterior_belief(x_t_1, u_t, alpha, ret=False, marginalise_p3=False, N_
         dtheta = 2 * np.pi / N_theta
         
 
-        ##STUDENT_CODE #TODO #3.4 A) Compute gridmap
         theta_values = np.arange(0, 2 * np.pi, dtheta)
         for x_idx in range(size):
             x = (x_idx - origin[0]) * res
@@ -85,12 +78,10 @@ def plot_posterior_belief(x_t_1, u_t, alpha, ret=False, marginalise_p3=False, N_
                         [x, y, theta], x_t_1, u_t, alpha
                     )
 
-        ##END_STUDENT_CODE 
 
     
     else:
         marginalise_p3 = True
-        ##STUDENT_CODE #TODO #3.4 B) Use Marginalised motion_model marginalise_p3=True and pass to motion_model!
         for x_idx in range(size):
             x = (x_idx - origin[0]) * res
             for y_idx in range(size):
@@ -99,7 +90,6 @@ def plot_posterior_belief(x_t_1, u_t, alpha, ret=False, marginalise_p3=False, N_
                     [x, y, 0.0], x_t_1, u_t, alpha, marginalise_p3=True
                 )
 
-        ##END_STUDENT_CODE 
 
     if ret:
         return gridmap
@@ -118,14 +108,12 @@ def evaluate_sample_odometry(alpha, pose_0, odom, ret=False):
     last_pose = pose_0
     for odom_idx in range(len(odom) - 1):
 
-        ##STUDENT_CODE #TODO: compute xt, yt, theta_t from odometry
         u_t = [odom[odom_idx], odom[odom_idx + 1]]
         rot1, trans, rot2 = inverse_motion_model(*u_t)
         x_t = last_pose[0] + trans * np.cos(last_pose[2] + rot1)
         y_t = last_pose[1] + trans * np.sin(last_pose[2] + rot1)
         theta_t = wrapToPi(last_pose[2] + rot1 + rot2)
 
-        ##END_STUDENT_CODE
         current_pose = [x_t, y_t, theta_t]
         gt_poses.append(current_pose)
         last_pose = current_pose
@@ -145,7 +133,6 @@ def evaluate_sample_odometry(alpha, pose_0, odom, ret=False):
     for odom_idx in range(len(odom) - 1):
         # calculate the new samples
 
-        ##STUDENT_CODE # TODO: update all samples and the current_pose
         u_t = [odom[odom_idx], odom[odom_idx + 1]]
         for i in range(num_samples):
             samples[i] = sample_motion_model(samples[i], u_t, alpha)
@@ -157,7 +144,6 @@ def evaluate_sample_odometry(alpha, pose_0, odom, ret=False):
             ]
         )
 
-        ##END_STUDENT_CODE
         estimated_poses.append(current_pose)
         samples_for_plot.append(np.copy(samples))
 
@@ -210,7 +196,6 @@ def get_sample(std):
 
 
 def sample_motion_model(pose_t_1, u_t, alpha):
-    ##STUDENT_CODE #TODO Compute x_t, y_t and theta_t
     pose_t_1 = np.asarray(pose_t_1, dtype=float)
     rot1, trans, rot2 = inverse_motion_model(u_t[0], u_t[1])
 
@@ -224,7 +209,6 @@ def sample_motion_model(pose_t_1, u_t, alpha):
     y_t = pose_t_1[1] + trans_hat * np.sin(pose_t_1[2] + rot1_hat)
     theta_t = wrapToPi(pose_t_1[2] + rot1_hat + rot2_hat)
 
-    ##END_STUDENT_CODE
     return x_t, y_t, theta_t
 
 
